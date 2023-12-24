@@ -17,33 +17,28 @@ export default function AuthUI() {
         appearance={{
           theme: ThemeSupa,
           style: {
-            // button: { background: 'red', },
-            divider: { background: '#334155' },
+            divider: { background: '#3A3F42' },
             anchor: { color: 'white' },
-            label: { color: '#cbd5e1' },
-            input: { color: 'white', background: '#020617', borderColor: '#334155' },
-            message: { background: '#09090b' }
+            label: { color: '#ECEDEE' },
+            input: { color: 'white', background: 'transparent', borderColor: '#3A3F42' },
+            message: { background: '#11131f' }
           },
           variables: {
             default: {
               colors: {
-                brand: '#14b8a6',
-                brandAccent: '#2dd4bf',
-                brandButtonText: '#000000'
+                brand: '#3E63DD',
+                brandAccent: '#3E63DD',
+                brandButtonText: '#ECEDEE'
               }
             },
             dark: {
               colors: {
-                brandButtonText: '#ffffff ',
-                // defaultButtonBackground: 'red',
-                // defaultButtonBackgroundHover: 'red',
-                //..
+                brandButtonText: '#ECEDEE ',
               },
             },
           }
         }
         }
-      // theme="dark"
       />
     </div>
   );

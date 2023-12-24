@@ -25,8 +25,7 @@ html {
 
 html,
 body {
-  @apply bg-slate-950;
-  
+  background: linear-gradient(180deg, #11131F 12.48%, #15192D 100%);
 }
 
 body {
