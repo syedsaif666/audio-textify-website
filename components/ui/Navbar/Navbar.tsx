@@ -2,7 +2,7 @@
 
 import { useSupabase } from '@/app/supabase-provider';
 import avatar from '@/assets/avatar.svg';
-import Logo from '@/components/icons/Logo';
+import Logo from '@/components/icons';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { User, UserResponse } from '@supabase/supabase-js';
 import Image from 'next/image';
@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { Fragment, useEffect, useState } from 'react';
 // import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { RiMenuFill, RiCloseLine } from 'react-icons/ri';
+import Button from '../Button';
 
 const navigation = [
   { name: 'Features', href: '/#Features', current: true },
@@ -43,11 +44,11 @@ export default function Navbar() {
     setUser(supabaseUser.data.user);
   }
   return (
-    <Disclosure as="nav" className="bg-[#020617]">
+    <Disclosure as="nav" className="bg-[#11131F]">
       {({ open }) => (
         <>
-          <div className="mx-auto max-w-5xl px-2 sm:px-6 lg:px-0">
-            <div className="relative flex h-[80px] items-center justify-between">
+          <div className="mx-auto max-w-[90%] px-2 sm:px-6 lg:px-0">
+            <div className="relative flex h-[4.5rem] pt-4 items-center justify-between">
               <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                 {/* Mobile menu button*/}
                 <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
@@ -60,27 +61,21 @@ export default function Navbar() {
                   )}
                 </Disclosure.Button>
               </div>
-              <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                 <div
                   onClick={() => router.push('/')}
-                  className="flex flex-shrink-0 items-center cursor-pointer"
+                  className="flex w-[192.27px] h-8 items-center cursor-pointer"
                 >
-                  <Logo />
-                  {/* <img
-                    className="h-8 w-auto"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=teal&shade=500"
-                    alt="Your Company"
-                  /> */}
+                  <Logo className="w-16"/>
                 </div>
-                <div className="hidden sm:ml-6 sm:block">
-                  <div className="flex space-x-4">
+                <div className="hidden sm:ml-6 lg:ml-0 sm:block">
+                  <div className="flex gap-10">
                     {navigation.map((item) => (
                       <a
                         key={item.name}
                         href={item.href}
                         className={classNames(
-                          'text-slate-300 hover:bg-slate-800 hover:text-white',
-                          'rounded-md px-3 py-2 text-sm font-medium'
+                          'text-[#ECEDEE] font-Urbanist text-[0.9375rem] font-medium tracking-[0.00469rem] hover:bg-slate-800 hover:text-white',
+                          'rounded-md px-3'
                         )}
                         aria-current={item.current ? 'page' : undefined}
                       >
@@ -89,20 +84,12 @@ export default function Navbar() {
                     ))}
                   </div>
                 </div>
-              </div>
-              <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                {/* <button
-                  type="button"
-                  className="relative rounded-full bg-slate-800 p-1 text-slate-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800"
-                >
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button> */}
+              <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 lg:ml-0 sm:pr-0">
 
                 {/* Profile dropdown */}
                 {user ? (
                   <button
+                    type="button"
                     onClick={() => router.push('/dashboard')}
                     className="relative flex rounded bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800"
                   >
@@ -111,71 +98,19 @@ export default function Navbar() {
                     <Image className="h-8 w-8" src={avatar} alt="" />
                   </button>
                 ) : (
-                  <a
-                    href="/signin"
-                    className={classNames(
-                      'text-slate-300 hover:bg-slate-800 hover:text-white',
-                      'rounded-md px-3 py-2 text-sm font-medium'
-                    )}
-                  >
-                    Sign In
-                  </a>
-                )}
-                {/* <Menu as="div" className="relative ml-3">
-                  <div>
-                    <Menu.Button className="relative flex rounded-full bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800">
-                      <span className="absolute -inset-1.5" />
-                      <span className="sr-only">Open user menu</span>
-                      <img
-                        className="h-8 w-8 rounded-full"
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                        alt=""
-                      />
-                    </Menu.Button>
+                  <div className="flex items-center gap-[0.375rem]">
+                    <a
+                      href="/signin"
+                      className={classNames(
+                        'font-Urbanist text-[#ECEDEE] hover:bg-slate-800 hover:text-white',
+                        'rounded-md px-3 text-[0.875rem] font-medium'
+                      )}
+                    >
+                      Login
+                    </a>
+                    <Button width={128} height={40} fontSize={15}> Get Started </Button>
                   </div>
-                  <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-100"
-                    enterFrom="transform opacity-0 scale-95"
-                    enterTo="transform opacity-100 scale-100"
-                    leave="transition ease-in duration-75"
-                    leaveFrom="transform opacity-100 scale-100"
-                    leaveTo="transform opacity-0 scale-95"
-                  >
-                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            href="#"
-                            className={classNames(active ? 'bg-slate-100' : '', 'block px-4 py-2 text-sm text-slate-700')}
-                          >
-                            Your Profile
-                          </a>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            href="#"
-                            className={classNames(active ? 'bg-slate-100' : '', 'block px-4 py-2 text-sm text-slate-700')}
-                          >
-                            Settings
-                          </a>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            href="#"
-                            className={classNames(active ? 'bg-slate-100' : '', 'block px-4 py-2 text-sm text-slate-700')}
-                          >
-                            Sign out
-                          </a>
-                        )}
-                      </Menu.Item>
-                    </Menu.Items>
-                  </Transition>
-                </Menu> */}
+                )}
               </div>
             </div>
           </div>

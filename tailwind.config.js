@@ -14,9 +14,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-inter)', ...fontFamily.sans],
-
-      }
+        Urbanist: ["Urbanist", "sans-serif"],
+      },
     }
   },
   plugins: [

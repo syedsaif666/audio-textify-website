@@ -1,17 +1,13 @@
 .root {
-  @apply bg-white text-zinc-800 cursor-pointer inline-flex px-10 rounded-xl leading-6  transition ease-in-out duration-150 shadow-sm font-medium text-center justify-center py-1 border border-zinc-400 items-center;
+  @apply bg-[#3E63DD] text-[#fff] cursor-pointer inline-flex px-3 font-Urbanist rounded-[62.5rem] tracking-[0.00469rem] transition ease-in-out duration-150 shadow-sm font-medium text-center justify-center border-none items-center;
 }
 
 .root:hover {
-  @apply bg-zinc-100 border border-zinc-900  ;
-}
-
-.root:focus {
-  @apply outline-none ring-2 ring-teal-500 ring-opacity-50;
+  @apply bg-[#5373E7];
 }
 
 .root[data-active] {
-  @apply bg-zinc-600;
+  @apply bg-[#5373E7];
 }
 
 .loading {
@@ -22,11 +18,30 @@
   @apply py-2 transform-none normal-case;
 }
 
+.gray {
+  @apply bg-[#ECEDEE] text-[#000];
+}
+
+
 .disabled,
 .disabled:hover {
-  @apply text-zinc-400 border-zinc-600 bg-zinc-700 cursor-not-allowed;
-  filter: slatescale(1);
-  -webkit-transform: translateZ(0);
-  -webkit-perspective: 1000;
-  -webkit-backface-visibility: hidden;
+  @apply bg-[#26292B] text-[#4C5155] cursor-not-allowed;
 }
+
+.soft {
+  @apply bg-[#192140] text-[#849DFF];
+}
+
+.surface {
+  @apply bg-[#15192D] border border-[#273E89] text-[#849DFF];
+}
+
+.outline {
+  @apply bg-transparent border border-[#273E89] text-[#849DFF];
+}
+
+.ghost {
+  @apply bg-transparent text-[#849DFF];
+}
+
+
