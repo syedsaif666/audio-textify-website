@@ -7,6 +7,11 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import NextCors from 'nextjs-cors';
 import { Database } from '@/types_db';
 import { AuthResponse, SupabaseClient, createClient } from '@supabase/supabase-js';
+import { createReadStream, statSync } from 'fs';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 const tableName = process.env.TABLE_NAME!;
 
@@ -62,6 +67,13 @@ const getFileExtension = (urlString: string) => {
   return path.extname(pathname).toLowerCase();
 };
 
+// Function to get the duration of the audio file
+const getAudioDuration = async (filePath: string): Promise<number> => {
+  const { stdout } = await execAsync(`ffprobe -i ${filePath} -show_entries format=duration -v quiet -of csv="p=0"`);
+  return parseFloat(stdout);
+};
+
+// Main transcription function
 const startTranscription = async (url: string, filePath: string, audioPath: string, supabase: SupabaseClient, userId: string) => {
   console.log('Downloading File');
   await downloadFile(url, filePath);
@@ -79,41 +91,68 @@ const startTranscription = async (url: string, filePath: string, audioPath: stri
     throw new Error('Unsupported file type');
   }
 
-  console.log('Starting transcription now');
+  const segmentDuration = 20; // in seconds
+  const audioDuration = await getAudioDuration(fileForTranscription);
+  const numberOfSegments = Math.ceil(audioDuration / segmentDuration);
+
+  const transcriptionArray = [];
+
+  for (let i = 0; i < numberOfSegments; i++) {
+    const startTime = i * segmentDuration;
+    const endTime = Math.min((i + 1) * segmentDuration, audioDuration);
+    const segmentPath = `${fileForTranscription}_segment_${i}.wav`;
+
+    // Create a 20-second audio segment
+    await execAsync(`ffmpeg -i ${fileForTranscription} -ss ${startTime} -t ${segmentDuration} -c copy ${segmentPath}`);
+
+    // Transcribe each segment and store in the array
+    const segmentTranscript = await transcribeSegment(segmentPath, startTime, endTime);
+    transcriptionArray.push(segmentTranscript);
+  }
+
+  // Insert the array into Supabase
+  const insertSuccess = await insertTranscription(url, transcriptionArray, supabase, userId);
+  if (insertSuccess) {
+    console.log('All transcriptions have been successfully inserted into Supabase.');
+  }
+};
+
+// Function to transcribe a single segment
+const transcribeSegment = async (segmentPath: string, startTime: number, endTime: number): Promise<{startTime: number, endTime: number, text: string}> => {
   const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
   });
 
   const openai = new OpenAIApi(configuration);
-  const audioStream: any = fs.createReadStream(fileForTranscription);
-  openai.createTranscription(
-    audioStream,
-    'whisper-1'
-  ).then(async (resp) => {
-    const transcript = resp?.data?.text;
+  const audioStream: any = createReadStream(segmentPath);
+  
+  const resp = await openai.createTranscription(audioStream, 'whisper-1');
+  const transcript = resp?.data?.text;
 
-    // Content moderation check
-    const response = await openai.createModeration({
-      input: transcript,
-    });
+  return {
+    startTime,
+    endTime,
+    text: transcript
+  };
+};
 
-    if (response?.data?.results[0]?.flagged) {
-      console.error({ error: 'Inappropriate content detected. Please try again.' });
-      return;
-    }
-    console.log('Inserting transcription to supabase');
+// Function to insert the transcribed array into Supabase
+const insertTranscription = async (url: string, transcriptionArray: any[], supabase: SupabaseClient, userId: string): Promise<boolean> => {
+  console.log('Inserting transcription to Supabase');
 
-    const { error } = await supabase.from(tableName).insert({
-      input_url: url,
-      transcribed_data: transcript,
-      user_id: userId
-    });
-    if (error ) {
-      console.error("Supabase Error", error);
-    } else {
-      console.log('Inserting transcription to supabase done');
-    }
-  }).catch((e: AxiosError | any) => console.error('Exception: ', e));
+  const { error } = await supabase.from(tableName).insert({
+    input_url: url,
+    transcribed_data: transcriptionArray,
+    user_id: userId
+  });
+
+  if (error) {
+    console.error("Supabase Error:", error);
+    return false;
+  } else {
+    console.log('Transcription inserted into Supabase successfully.');
+    return true;
+  }
 };
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -160,4 +199,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default handler;
+export default handler;
