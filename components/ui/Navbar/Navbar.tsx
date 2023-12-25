@@ -8,14 +8,14 @@ import { User, UserResponse } from '@supabase/supabase-js';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Fragment, useEffect, useState } from 'react';
-// import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { RiMenuFill, RiCloseLine } from 'react-icons/ri';
 import Button from '../Button';
 
 const navigation = [
   { name: 'Features', href: '/#Features', current: true },
   { name: 'Pricing', href: '/#Pricing', current: false },
-  { name: 'FAQ', href: '/faq', current: false }
+  { name: 'FAQ', href: '/faq', current: false },
+  { name: 'My Transcriptions', href: '/my-transcriptions', current: false, private: true },
 ];
 
 function classNames(...classes: string[]) {
@@ -43,6 +43,8 @@ export default function Navbar() {
     const supabaseUser = await supabase.auth.getUser();
     setUser(supabaseUser.data.user);
   }
+
+
   return (
     <Disclosure as="nav" className="bg-[#11131F]">
       {({ open }) => (
@@ -63,13 +65,14 @@ export default function Navbar() {
               </div>
                 <div
                   onClick={() => router.push('/')}
-                  className="flex w-[192.27px] h-8 items-center cursor-pointer"
+                  className="flex items-center cursor-pointer"
                 >
                   <Logo className="w-16"/>
                 </div>
                 <div className="hidden sm:ml-6 lg:ml-0 sm:block">
                   <div className="flex gap-10">
-                    {navigation.map((item) => (
+                  {navigation.map((item) => (
+                    item.private && !user ? null : (
                       <a
                         key={item.name}
                         href={item.href}
@@ -81,7 +84,8 @@ export default function Navbar() {
                       >
                         {item.name}
                       </a>
-                    ))}
+                    )
+                  ))}
                   </div>
                 </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 lg:ml-0 sm:pr-0">

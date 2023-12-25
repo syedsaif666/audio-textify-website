@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 export default function Footer() {
   const router = useRouter();
   return (
-    <footer className="w-full py-24 px-12 bg-[#020617] flex justify-center">
+    <footer className="w-full py-24 px-12 bg-transparent flex justify-center">
       <div className=" flex flex-col gap-16 justify-center items-center max-w-5xl w-full">
         <div className="flex flex-col gap-8 justify-center items-center">
           <div onClick={() => router.push('/')}>
