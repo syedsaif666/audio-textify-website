@@ -22,6 +22,9 @@
   @apply bg-[#ECEDEE] text-[#000];
 }
 
+.delete {
+  @apply bg-[#AA2429] text-[#fff];
+}
 
 .disabled,
 .disabled:hover {

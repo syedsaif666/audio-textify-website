@@ -13,7 +13,7 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   width?: number;
   height?: number;
-  variant?: 'slim' | 'flat' | 'gray' | 'primary';
+  variant?: 'slim' | 'flat' | 'gray' | 'primary' | 'delete';
   shape?: 'soft' | 'surface' | 'outline' | 'ghost';
   fontSize?: number;
   Component?: React.ComponentType;
@@ -40,8 +40,10 @@ const Button = forwardRef<HTMLButtonElement, Props>((props, buttonRef) => {
     styles.root,
     {
       [styles.slim]: variant === 'slim',
+      [styles.delete]: variant === 'delete',
       [styles.loading]: loading,
       [styles.disabled]: disabled,
+      [styles.soft]: shape === 'soft',
     },
     className
   );
@@ -49,6 +51,7 @@ const Button = forwardRef<HTMLButtonElement, Props>((props, buttonRef) => {
     <Component
       aria-pressed={active}
       data-variant={variant}
+      data-shape={shape}
       ref={mergeRefs([ref, buttonRef])}
       className={rootClassName}
       disabled={disabled}

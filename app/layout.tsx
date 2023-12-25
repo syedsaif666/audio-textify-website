@@ -3,9 +3,6 @@ import { PropsWithChildren } from 'react';
 import 'styles/main.css';
 import Footer from '@/components/ui/Footer';
 import Navbar from '@/components/ui/Navbar';
-import cn from 'classnames';
-import { Inter } from 'next/font/google';
-import Head from 'next/head';
 import Script from 'next/script';
 
 export const dynamic = 'force-dynamic';
@@ -46,20 +43,12 @@ export const metadata = {
   }
 };
 
-const inter = Inter({
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-  style: ['normal'],
-  subsets: ['latin'],
-  variable: '--font-inter'
-});
-
 export default function RootLayout({
-  // Layouts must accept a children prop.
-  // This will be populated with nested layouts or pages
   children
 }: PropsWithChildren) {
+
   return (
-    <html lang="en" className={`${inter.variable} font-sans`}>
+    <html lang="en" >
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
       />
@@ -68,7 +57,6 @@ export default function RootLayout({
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
- 
           gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}');
         `}
       </Script>
@@ -81,7 +69,6 @@ export default function RootLayout({
           >
             {children}
           </main>
-          {/* <Footer /> */}
           <Footer />
         </SupabaseProvider>
       </body>
