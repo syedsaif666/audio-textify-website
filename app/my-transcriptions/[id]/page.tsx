@@ -11,6 +11,7 @@ import Button from '@/components/ui/Button';
 import NoSsr from '@/components/ui/NoSsr';
 import LanguageDropdown from '@/components/ui/LanguageDropdown';
 import convertSecondsToHours from '@/utils/timeConversion';
+import GenerateDropdown from '@/components/ui/GenerateDropdown';
 
 
 const tableName = process.env.TABLE_NAME!;
@@ -44,7 +45,7 @@ async function Transcription({params, searchParams}: {params: {id: string}, sear
               <LanguageDropdown />
             </NoSsr>
             <NoSsr>
-              <LanguageDropdown />
+              <GenerateDropdown />
             </NoSsr>
           </div>
           <div className="flex gap-3">
