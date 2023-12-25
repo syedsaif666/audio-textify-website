@@ -29,7 +29,7 @@ const AllTranscriptions: React.FC = async () => {
       <h1 className="font-Urbanist text-[1.875rem] text-[#ECEDEE] font-semibold leading-9 tracking-[0.00938rem] ">My Transcriptions</h1>
       <div className="flex flex-col gap-7">
       {data?.map((transcription, index) => (
-        <Link href={`/my-transcriptions/${transcription.id}?${index + 1}`}>
+        <Link href={`/my-transcriptions/${transcription.id}?index=${index + 1}`}>
           <div className='flex items-center justify-between py-2 border-b border-[#192140]'>
             <div key={transcription.id} className='flex flex-col gap-3'>
               <h2 className='text-[#ECEDEE] font-Urbanist font-semi-bold tracking-[0.005rem] leading-6'>

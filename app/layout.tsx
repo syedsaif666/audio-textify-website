@@ -8,29 +8,23 @@ import Script from 'next/script';
 export const dynamic = 'force-dynamic';
 
 const meta = {
-  title: 'Classway | AI powered Assignment Assistant',
+  title: 'Audio Textify',
   description:
     'Your smart study sidekick, powered by AI, streamlining assignments and boosting your performance.',
-  // cardImage: '/og.png',
   robots: 'follow, index',
   favicon: '/favicon.ico',
-  // url: 'https://classway-website.vercel.app/',
   type: 'website'
 };
 
 export const metadata = {
   title: meta.title,
   description: meta.description,
-  // cardImage: meta.cardImage,
   robots: meta.robots,
   favicon: meta.favicon,
-  // url: meta.url,
   type: meta.type,
   openGraph: {
-    // url: meta.url,
     title: meta.title,
     description: meta.description,
-    // cardImage: meta.cardImage,
     type: meta.type,
     site_name: meta.title
   },
@@ -39,7 +33,6 @@ export const metadata = {
     site: '@vercel',
     title: meta.title,
     description: meta.description
-    // cardImage: meta.cardImage
   }
 };
 
