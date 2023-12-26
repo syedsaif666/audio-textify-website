@@ -14,15 +14,15 @@ const tableName = process.env.TABLE_NAME!;
 const AllTranscriptions: React.FC = async () => {
   const supabase = createServerComponentClient<Database>({ cookies })
 
-    const session = await getSession();
-    const user = session?.user;
-    const loggedInUserId = user?.id
+  const session = await getSession();
+  const user = session?.user;
+  const loggedInUserId = user?.id
 
-    if (!session) {
-      redirect('/signin')
-    }
+  if (!session) {
+    redirect('/signin')
+  }
 
-    const { data } = await supabase.from(tableName).select().eq('user_id', loggedInUserId);
+  const { data } = await supabase.from(tableName).select().eq('user_id', loggedInUserId);
 
   return (
     <div className="w-[64vw] m-auto pt-10 pb-10 flex flex-col gap-7">

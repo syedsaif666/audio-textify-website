@@ -26,6 +26,10 @@
   @apply bg-[#AA2429] text-[#fff];
 }
 
+.delete:hover {
+  @apply bg-[#AA2419];
+}
+
 .disabled,
 .disabled:hover {
   @apply bg-[#26292B] text-[#4C5155] cursor-not-allowed;
@@ -33,6 +37,10 @@
 
 .soft {
   @apply bg-[#192140] text-[#849DFF];
+}
+
+.soft:hover {
+  @apply bg-[#1C274F] text-[#849DFF]
 }
 
 .surface {

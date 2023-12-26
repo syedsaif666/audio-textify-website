@@ -9,9 +9,9 @@ import { Database } from '@/types_db';
 import '@/styles/audio.css';
 import Button from '@/components/ui/Button';
 import NoSsr from '@/components/ui/NoSsr';
-import LanguageDropdown from '@/components/ui/LanguageDropdown';
 import convertSecondsToHours from '@/utils/timeConversion';
-import GenerateDropdown from '@/components/ui/GenerateDropdown';
+import Language from '@/components/ui/Dropdown/Language';
+import Generate from '@/components/ui/Dropdown/Generate';
 
 
 const tableName = process.env.TABLE_NAME!;
@@ -29,6 +29,7 @@ async function Transcription({params, searchParams}: {params: {id: string}, sear
   }
 
   const { data } = await supabase.from(tableName).select().eq('user_id', loggedInUserId).eq('id', transcriptionId).maybeSingle();
+
   if (data) {
     return (
       <div className="w-[64vw] m-auto pt-10 pb-10 flex flex-col gap-7">
@@ -42,10 +43,10 @@ async function Transcription({params, searchParams}: {params: {id: string}, sear
           <div className="flex gap-3">
             <Button shape='soft' height={40} fontSize={15}>Summarize</Button>
             <NoSsr>
-              <LanguageDropdown />
+              <Language />
             </NoSsr>
             <NoSsr>
-              <GenerateDropdown />
+              <Generate />
             </NoSsr>
           </div>
           <div className="flex gap-3">
