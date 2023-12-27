@@ -10,27 +10,17 @@ import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import { createReadStream } from 'fs';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import formidable from 'formidable';
 
 const execAsync = promisify(exec);
 
 const tableName = process.env.TABLE_NAME!;
 
-const downloadFile = async (fileUrl: any, outputLocationPath: any) => {
-  const writer = fs.createWriteStream(outputLocationPath);
-
-  return axios({
-    method: 'get',
-    url: fileUrl,
-    responseType: 'stream',
-  }).then((response: any) => {
-    response.data.pipe(writer);
-    return new Promise((resolve, reject) => {
-      writer.on('finish', resolve);
-      writer.on('error', reject);
-    });
-  });
-};
-
+export const config = {
+  api: {
+    bodyParser: false
+  }
+}
 const extractAudioFromVideo = (videoFilePath: any, outputAudioPath: any) => {
   return new Promise((resolve, reject) => {
     ffmpeg(videoFilePath)
@@ -58,10 +48,10 @@ const getFileType = (filePath: string) => {
   }
 };
 
-const getFileExtension = (urlString: string) => {
+const getFileExtension = (pathname: string) => {
   // Parse the URL to get the pathname
-  const parsedUrl = new URL(urlString);
-  const pathname = parsedUrl.pathname;
+  // const parsedUrl = new URL(urlString);
+  // const pathname = parsedUrl.pathname;
 
   // Use path.extname to extract the extension from the pathname
   return path.extname(pathname).toLowerCase();
@@ -74,17 +64,17 @@ const getAudioDuration = async (filePath: string): Promise<number> => {
 };
 
 // Main transcription function
-const startTranscription = async (url: string, filePath: string, audioPath: string, supabase: SupabaseClient, userId: string) => {
-  console.log('Downloading File');
-  await downloadFile(url, filePath);
+const startTranscription = async (url: string, audioPath: string, supabase: SupabaseClient, userId: string) => {
+  // console.log('Downloading File');
+  // await downloadFile(url, filePath);
 
-  console.log('Download Step Finished');
+  // console.log('Download Step Finished');
   const fileType = getFileType(url);
 
-  let fileForTranscription = filePath;
+  let fileForTranscription = url;
   if (fileType === 'video') {
     console.log('Extracting Audio From Video');
-    await extractAudioFromVideo(filePath, audioPath);
+    await extractAudioFromVideo(url, audioPath);
     console.log('Extraction Finished');
     fileForTranscription = audioPath;
   } else if (fileType !== 'audio') {
@@ -157,10 +147,9 @@ const insertTranscription = async (url: string, transcriptionArray: any[], supab
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await NextCors(req, res, {
-    // Options
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
     origin: '*',
-    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+    optionsSuccessStatus: 200,
   });
 
   const access_token = req?.headers?.authorization?.split(' ')[1] || '';
@@ -178,24 +167,58 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   } catch (error) {
     return res.status(403).json({ error: 'Session Expired' });
   }
-  const url = req.body.url;
-  const alreadyExist = await supabase.from(tableName).select('*').filter('input_url', 'eq', url);
-  if (alreadyExist?.data && alreadyExist?.data?.length) {
-    return res.status(400).json({error: 'Already Exist'});
-  }
+
+  const form = formidable({
+    uploadDir: '/tmp',
+    keepExtensions: true
+  });
+
+  const file: any = await new Promise((res, reject) => {
+    form.parse(req, (err, fields, files) => {
+      if (err) {
+        res(null)
+      } else {
+        if (files?.file && files?.file[0]) {
+          res(files?.file[0])
+        } else  {
+          res(null);
+        }
+      }
+    })
+  })
 
 
-  const fileExt = getFileExtension(url);
-  const filePath = path.join('/tmp', `downloadedFile${Date.now()}${fileExt}`); // Temporary file path
-  const audioPath = path.join('/tmp', `audio${Date.now()}.wav`); // Temporary audio path
+  let url = file?.filepath;
 
-  try {
-    startTranscription(url, filePath, audioPath, supabase, userId);
-
-    res.status(200).json({message: 'URL submitted for processing'});
-  } catch (error) {
-    console.error('server error', error);
-    res.status(500).json({ error: 'Error' });
+  if (file && url && fs.existsSync(url)) {
+    
+    // const startIndex = url.indexOf('/tmp');
+    // url = url.substring(startIndex);
+    const alreadyExist = await supabase.from(tableName).select('*').filter('input_url', 'eq', url);
+    if (alreadyExist?.data && alreadyExist?.data?.length) {
+      return res.status(400).json({error: 'Already Exist'});
+    }
+  
+    const fileExt = getFileExtension(url);
+    // const filePath = path.join('/tmp', `downloadedFile${Date.now()}${fileExt}`); // Temporary file path
+    const audioPath = path.join('/tmp', `audio${Date.now()}.wav`); // Temporary audio path
+  
+    try {
+      startTranscription(url, audioPath, supabase, userId);
+      res.setHeader('Content-Type', 'audio/mpeg'); // Adjust the content type based on your file type
+      fs.createReadStream(url).pipe(res);
+      res.status(200).json({
+        message: 'File submitted for processing'
+      });
+    } catch (error) {
+      console.error('server error', error);
+      res.status(500).json({ error: 'Error' });
+    }
+  } else {
+    res.status(400).json({
+      success: false,
+      message: 'File is required'
+    })
   }
 };
 
