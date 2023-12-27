@@ -23,6 +23,7 @@ const Language: React.FC = () => {
         </svg>
       }
       buttonText="Language"
+      dropdownType="language"
     />
   );
 };

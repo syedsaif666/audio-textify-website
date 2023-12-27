@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Dropdown from '@/components/ui/Dropdown';
 
-const documentType = ['Convert to .doc', 'Convert to .pdf'];
+const documentType = ['Tweet/Tread', 'Article', 'More Details', 'Presentation', 'Note/Memo', 'Major Themes', 'Key words'];
 
 const Generate: React.FC = () => {
   const [selectedType, setSelectedType] = useState<string>('');
@@ -23,6 +23,7 @@ const Generate: React.FC = () => {
       </svg>
     }
     buttonText="Generate"
+    dropdownType="generate"
   />
   );
 };
