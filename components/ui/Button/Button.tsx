@@ -11,8 +11,8 @@ import styles from './Button.module.css';
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   active?: boolean;
   loading?: boolean;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
   variant?: 'slim' | 'flat' | 'gray' | 'primary' | 'delete';
   shape?: 'soft' | 'surface' | 'outline' | 'ghost';
   fontSize?: number;
@@ -56,7 +56,7 @@ const Button = forwardRef<HTMLButtonElement, Props>((props, buttonRef) => {
       className={rootClassName}
       disabled={disabled}
       style={{
-        width: width ? `${width}px` : 'auto',
+        width: width ? width : 'auto',
         height: height ? `${height}px` : 'auto',
         fontSize: fontSize || 'inherit',
       }}

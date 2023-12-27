@@ -12,6 +12,8 @@ import NoSsr from '@/components/ui/NoSsr';
 import convertSecondsToHours from '@/utils/timeConversion';
 import Language from '@/components/ui/Dropdown/Language';
 import Generate from '@/components/ui/Dropdown/Generate';
+import AudioPlayer from '@/components/ui/AudioPlayer';
+import SummarizeModal from '@/components/ui/Modals/Summarize';
 
 
 const tableName = process.env.TABLE_NAME!;
@@ -38,10 +40,14 @@ async function Transcription({params, searchParams}: {params: {id: string}, sear
           <span className='0.875rem leading-5'>{`#${data.id.substring(0, 20)}`}</span>
           <span>{new Date(data.created_at).toLocaleString()}</span>
         </div>
-        <audio src={data.input_url} controls={true}></audio>
+        <NoSsr>
+          <AudioPlayer />
+        </NoSsr>
         <div className="flex items-center justify-between">
           <div className="flex gap-3">
-            <Button shape='soft' height={40} fontSize={15}>Summarize</Button>
+            <NoSsr>
+              <SummarizeModal />
+            </NoSsr>
             <NoSsr>
               <Language />
             </NoSsr>

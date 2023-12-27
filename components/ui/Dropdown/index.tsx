@@ -30,7 +30,7 @@ const Dropdown: React.FC<DropdownProps> = ({
       <Menu.Button
         className={classNames(
           'flex w-44 h-10 justify-between rounded-3xl border bg-transparent border-[#313538] px-3 py-1.5 text-[0.9375rem] font-medium text-[#ECEDEE] items-center',
-          'active:border-red-500'
+          'active:border-[#fff]'
           )}
         >
             <div className="flex items-center gap-1.5 active:text-red-500">
