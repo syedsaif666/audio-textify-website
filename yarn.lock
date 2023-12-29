@@ -2460,6 +2460,16 @@ mime-types@^2.1.12:
   dependencies:
     mime-db "1.52.0"
 
+mime@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/mime/-/mime-4.0.1.tgz#ad7563d1bfe30253ad97dedfae2b1009d01b9470"
+  integrity sha512-5lZ5tyrIfliMXzFtkYyekWbtRXObT9OWa8IwQ5uxTBDHucNNwniRqo0yInflj+iYi5CBa6qxadGzGarDfuEOxA==
+
+mine@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/mine/-/mine-0.1.0.tgz#91937531216183d1fce497c01ce0eef61f8e73d3"
+  integrity sha512-4eZ5pYyTg35eF9QhY0PU2sBS5rvR/7zq2EeMsqFesJK1iDEepLb2MTGAVQ87dkJFZI596NK38t71E+CisFveoA==
+
 mini-svg-data-uri@^1.4.3:
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/mini-svg-data-uri/-/mini-svg-data-uri-1.4.4.tgz#8ab0aabcdf8c29ad5693ca595af19dd2ead09939"

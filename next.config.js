@@ -1,9 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+
+
+
   reactStrictMode: true,
   experimental: {
     serverActions: true
   },
+
   async headers() {
     return [
       {
@@ -41,7 +45,19 @@ const nextConfig = {
         ]
       }
     ];
+  },
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Existing webpack configuration
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        'process.env.FLUENTFFMPEG_COV': false
+      })
+    );
+
+    // Any additional webpack configurations go here
+
+    return config;
   }
 };
 
-module.exports = nextConfig;
+module.exports = nextConfig;

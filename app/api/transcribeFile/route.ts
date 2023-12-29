@@ -1,26 +1,20 @@
+import { Database } from "@/types_db";
+import { SupabaseClient, createClient } from "@supabase/supabase-js";
+import { headers } from "next/headers";
 import { Configuration, OpenAIApi } from 'openai';
 import * as fs from 'fs';
-import axios, { AxiosError } from 'axios';
 import path from 'path';
 import ffmpeg from 'fluent-ffmpeg';
-import { NextApiRequest, NextApiResponse } from 'next';
-import NextCors from 'nextjs-cors';
-import { Database } from '@/types_db';
-import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import { createReadStream } from 'fs';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import formidable from 'formidable';
+import { stat, mkdir, writeFile } from "fs/promises";
+import mime from "mime";
 
 const execAsync = promisify(exec);
 
 const tableName = process.env.TABLE_NAME!;
 
-export const config = {
-  api: {
-    bodyParser: false
-  }
-}
 const extractAudioFromVideo = (videoFilePath: any, outputAudioPath: any) => {
   return new Promise((resolve, reject) => {
     ffmpeg(videoFilePath)
@@ -145,81 +139,103 @@ const insertTranscription = async (url: string, transcriptionArray: any[], supab
   }
 };
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  await NextCors(req, res, {
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    origin: '*',
-    optionsSuccessStatus: 200,
-  });
-
-  const access_token = req?.headers?.authorization?.split(' ')[1] || '';
-  const refresh_token = req?.headers['X-Refresh-Token'] || req?.headers['x-refresh-token'] || '';
-
-  const supabase = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-  let userId: string;
+// Write POST request for AppRouter in Next.js. I want x-refresh-token and authorization header
+export async function POST(req: Request) {
   try {
-    const session = await supabase.auth.setSession({ access_token, refresh_token: ( typeof refresh_token === 'string' ) ? refresh_token : refresh_token[0] });
-    if (!session?.data?.user?.id) throw new Error('Session Expired');
-    userId = session?.data?.user?.id
-  } catch (error) {
-    return res.status(403).json({ error: 'Session Expired' });
-  }
+    const headersList = headers();
+    const access_token = headersList.get('authorization')?.split(' ')[1] || '';
+    const refresh_token = headersList.get('X-Refresh-Token') || headersList.get('x-refresh-token') || '';
 
-  const form = formidable({
-    uploadDir: '/tmp',
-    keepExtensions: true
-  });
-
-  const file: any = await new Promise((res, reject) => {
-    form.parse(req, (err, fields, files) => {
-      if (err) {
-        res(null)
-      } else {
-        if (files?.file && files?.file[0]) {
-          res(files?.file[0])
-        } else  {
-          res(null);
-        }
-      }
-    })
-  })
-
-
-  let url = file?.filepath;
-
-  if (file && url && fs.existsSync(url)) {
-    
-    // const startIndex = url.indexOf('/tmp');
-    // url = url.substring(startIndex);
-    const alreadyExist = await supabase.from(tableName).select('*').filter('input_url', 'eq', url);
-    if (alreadyExist?.data && alreadyExist?.data?.length) {
-      return res.status(400).json({error: 'Already Exist'});
-    }
-  
-    const fileExt = getFileExtension(url);
-    // const filePath = path.join('/tmp', `downloadedFile${Date.now()}${fileExt}`); // Temporary file path
-    const audioPath = path.join('/tmp', `audio${Date.now()}.wav`); // Temporary audio path
-  
+    const supabase = createClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    let userId: string;
     try {
-      startTranscription(url, audioPath, supabase, userId);
-      res.setHeader('Content-Type', 'audio/mpeg'); // Adjust the content type based on your file type
-      fs.createReadStream(url).pipe(res);
-      res.status(200).json({
-        message: 'File submitted for processing'
-      });
+      const session = await supabase.auth.setSession({ access_token, refresh_token: ( typeof refresh_token === 'string' ) ? refresh_token : refresh_token[0] });
+      if (!session?.data?.user?.id) throw new Error('Session Expired');
+      userId = session?.data?.user?.id
     } catch (error) {
-      console.error('server error', error);
-      res.status(500).json({ error: 'Error' });
+      return Response.json({ error: 'Session Expired' });
     }
-  } else {
-    res.status(400).json({
-      success: false,
-      message: 'File is required'
-    })
-  }
-};
 
-export default handler;
+    const body = await req.formData();
+
+    const file = body.get("file") as Blob | null;
+    if (!file) {
+      return Response.json(
+        { error: "File blob is required." },
+        { status: 400 }
+      );
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const uploadDir = `/tmp`;
+
+    try {
+      await stat(uploadDir);
+    } catch (e: any) {
+      if (e.code === "ENOENT") {
+        await mkdir(uploadDir, { recursive: true });
+      } else {
+        console.error(
+          "Error while trying to create directory when uploading a file\n",
+          e
+        );
+        return Response.json(
+          { error: "Something went wrong." },
+          { status: 500 }
+        );
+      }
+    }
+
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const filename = `${uniqueSuffix}.${mime.getExtension(file.type)}`;
+    try {
+      await writeFile(`${uploadDir}/${filename}`, buffer);
+    } catch (e) {
+      console.error("Error while trying to upload a file\n", e);
+      return Response.json(
+        { error: "Something went wrong." },
+        { status: 500 }
+      );
+    }
+
+    const url = `${uploadDir}/${filename}`;
+
+    if (file && url && fs.existsSync(url)) {
+      
+      // const startIndex = url.indexOf('/tmp');
+      // url = url.substring(startIndex);
+      const alreadyExist = await supabase.from(tableName).select('*').filter('input_url', 'eq', url);
+      if (alreadyExist?.data && alreadyExist?.data?.length) {
+        return Response.json({error: 'Already Exist'}, {status: 400});
+      }
+    
+      const fileExt = getFileExtension(url);
+      // const filePath = path.join('/tmp', `downloadedFile${Date.now()}${fileExt}`); // Temporary file path
+      const audioPath = path.join('/tmp', `audio${Date.now()}.wav`); // Temporary audio path
+    
+      try {
+        startTranscription(url, audioPath, supabase, userId);
+        return Response.json({
+          message: 'File submitted for processing'
+        }, {status: 200});
+      } catch (error) {
+        console.error('server error', error);
+        return Response.json({ error: 'Error' }, {status: 500});
+      }
+    } else {
+      return Response.json({ error: 'File is required' }, {status: 400});
+    }
+
+  } catch (err: any) {
+    console.log(err);
+    return new Response(
+      JSON.stringify({ error: { statusCode: 500, message: err.message } }),
+      {
+        status: 500
+      }
+    );
+  }
+}
