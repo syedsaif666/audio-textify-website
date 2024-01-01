@@ -65,12 +65,12 @@ export default function Navbar() {
               </div>
                 <div
                   onClick={() => router.push('/')}
-                  className="flex items-center cursor-pointer"
+                  className="flex items-center cursor-pointer flex-1"
                 >
                   <Logo className="w-16"/>
                 </div>
-                <div className="hidden sm:ml-6 lg:ml-0 sm:block">
-                  <div className="flex gap-10">
+                <div className="hidden sm:ml-6 lg:ml-0 sm:block flex-1">
+                  <div className="flex gap-10 justify-center">
                   {navigation.map((item) => (
                     item.private && !user ? null : (
                       <a
@@ -88,7 +88,7 @@ export default function Navbar() {
                   ))}
                   </div>
                 </div>
-              <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 lg:ml-0 sm:pr-0">
+              <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 lg:ml-0 sm:pr-0 flex-1 justify-end">
 
                 {/* Profile dropdown */}
                 {user ? (
