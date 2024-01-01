@@ -5,7 +5,6 @@ import {
   getActiveProductsWithPrices
 } from '@/app/supabase-server';
 import CTA from '@/components/sections/CTA';
-import FAQs from '@/components/sections/FAQ';
 import Features from '@/components/sections/Features';
 import GettingStarted from '@/components/sections/GettingStarted';
 import Hero from '@/components/sections/Hero';
