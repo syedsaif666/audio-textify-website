@@ -69,7 +69,7 @@ export default function Navbar() {
                 >
                   <Logo className="w-16"/>
                 </div>
-                <div className="hidden sm:ml-6 lg:ml-0 sm:block flex-1">
+                <div className="hidden sm:ml-6 lg:ml-0 sm:block flex-auto">
                   <div className="flex gap-10 justify-center">
                   {navigation.map((item) => (
                     item.private && !user ? null : (

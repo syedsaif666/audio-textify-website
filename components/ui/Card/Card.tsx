@@ -1,28 +1,31 @@
 "use client"
-import {ReactNode, useEffect, useState} from 'react';
 
-
+import { ReactNode } from 'react';
 
 interface Props {
     title: string;
     description?: string;
     footer?: ReactNode;
     children: ReactNode;
-}
-
-export default function Card({title, description, footer, children} : Props) {
-
+    last?: boolean;
+  }
+  
+  function Card({ title, description, children, last = false }: Props) {
     return (
-        <div className="w-full max-w-3xl m-auto my-8 border rounded-md p border-zinc-700">
-
-            <div className="px-5 py-4">
-                <h3 className="mb-1 text-2xl font-medium">
-                    {title}</h3>
-                <p className="text-zinc-300">
-                    {description}</p>
-                {children} </div>
-            <div className="p-4 border-t rounded-b-md border-zinc-700 bg-zinc-900 text-zinc-500">
-                {footer} </div>
+      <div
+        className={`w-full max-w-5xl m-auto rounded-none ${
+          !last ? 'border-b' : ''
+        } border-[#22346E] flex py-14 px-0 justify-between items-center`}
+      >
+        <div className="flex justify-between w-full items-end gap-4 max-md:items-start max-md:flex-col">
+          <div className="flex flex-col gap-y-2.5">
+            <h3 className="text-xl font-semibold text-[#ECEDEE] tracking-[0.00625rem]">{title}</h3>
+            <p className="text-sm	font-medium	text-[#9BA1A6] tracking-[0.00438rem]">{description}</p>
+          </div>
+          {children}
         </div>
+      </div>
     );
-}
+  }
+
+  export default Card;

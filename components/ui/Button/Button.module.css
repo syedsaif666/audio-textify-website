@@ -30,6 +30,10 @@
   @apply bg-[#AA2419];
 }
 
+.deactivate {
+  @apply bg-[#8A1E34]
+}
+
 .disabled,
 .disabled:hover {
   @apply bg-[#26292B] text-[#4C5155] cursor-not-allowed;

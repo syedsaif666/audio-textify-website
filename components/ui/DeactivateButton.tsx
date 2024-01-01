@@ -1,9 +1,10 @@
 'use client';
 
 import { useSupabase } from '@/app/supabase-provider';
-import { Modal, Button } from 'flowbite-react';
+import { Modal } from 'flowbite-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Button from '@/components/ui/Button';
 
 export default function DeactivateButton() {
   const router = useRouter();
@@ -17,15 +18,9 @@ export default function DeactivateButton() {
   };
   return (
     <>
-      <button
-        className="flex h-[40px] py-[12px] px-[16px] justify-center items-center space-x-2.5 rounded-lg bg-[#991B1B] hover:bg-[#DC2626] cursor-pointer"
-        onClick={() => props.setOpenModal('pop-up')} // disabled={true}
-      >
-        {/* WARNING - In Next.js 13.4.x server actions are in alpha and should not be used in production code! */}
-        <p className="text-[#020617] font-inter text-[15px] font-medium tracking-[0.075px]">
-          Deactivate
-        </p>
-      </button>
+      <Button width={107} height={40} fontSize={15} variant="deactivate" onClick={() => props.setOpenModal('pop-up')}>
+        Deactivate
+      </Button>
       <Modal
         show={props.openModal === 'pop-up'}
         size="md"

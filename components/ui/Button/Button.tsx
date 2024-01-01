@@ -13,7 +13,7 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   width?: number | string;
   height?: number | string;
-  variant?: 'slim' | 'flat' | 'gray' | 'primary' | 'delete';
+  variant?: 'slim' | 'flat' | 'gray' | 'primary' | 'delete' | 'deactivate';
   shape?: 'soft' | 'surface' | 'outline' | 'ghost';
   fontSize?: number;
   Component?: React.ComponentType;
@@ -41,6 +41,7 @@ const Button = forwardRef<HTMLButtonElement, Props>((props, buttonRef) => {
     {
       [styles.slim]: variant === 'slim',
       [styles.delete]: variant === 'delete',
+      [styles.deactivate]: variant === 'deactivate',
       [styles.loading]: loading,
       [styles.disabled]: disabled,
       [styles.soft]: shape === 'soft',
