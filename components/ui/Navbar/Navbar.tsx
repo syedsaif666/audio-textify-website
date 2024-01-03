@@ -112,7 +112,7 @@ export default function Navbar() {
                     >
                       Login
                     </a>
-                    <Button width={128} height={40} fontSize={15}> Get Started </Button>
+                    <Button variant='primary' shape='solid' width={128} height={40} fontSize={15}> Get Started </Button>
                   </div>
                 )}
               </div>

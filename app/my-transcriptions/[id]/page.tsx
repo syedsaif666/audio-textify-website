@@ -14,7 +14,8 @@ import Language from '@/components/ui/Dropdown/Language';
 import Generate from '@/components/ui/Dropdown/Generate';
 import AudioPlayer from '@/components/ui/AudioPlayer';
 import SummarizeModal from '@/components/ui/Modals/Summarize';
-
+import DownloadModal from '@/components/ui/Modals/Download';
+import DeleteModal from '@/components/ui/Modals/Delete';
 
 const tableName = process.env.TABLE_NAME!;
 
@@ -56,8 +57,12 @@ async function Transcription({params, searchParams}: {params: {id: string}, sear
             </NoSsr>
           </div>
           <div className="flex gap-3">
-            <Button height={40} fontSize={15}>Download</Button>
-            <Button variant='delete' height={40} fontSize={15}>Delete</Button>
+            <NoSsr>
+              <DownloadModal />
+            </NoSsr>
+            <NoSsr>
+              <DeleteModal />
+            </NoSsr>
           </div>
         </div>
         <div className='flex flex-col gap-7'>

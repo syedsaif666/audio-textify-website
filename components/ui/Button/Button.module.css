@@ -1,13 +1,91 @@
 .root {
-  @apply bg-[#3E63DD] text-[#fff] cursor-pointer inline-flex px-3 font-Urbanist rounded-[62.5rem] tracking-[0.00469rem] transition ease-in-out duration-150 shadow-sm font-medium text-center justify-center border-none items-center;
+  @apply cursor-pointer inline-flex px-3 font-Urbanist rounded-[62.5rem] tracking-[0.00469rem] transition ease-in-out duration-150 shadow-sm font-medium text-center justify-center items-center;
 }
 
-.root:hover {
+.root[data-variant='primary'][data-shape='solid'] {
+  @apply bg-[#3E63DD] text-[#fff] border-none;
+}
+
+.root[data-variant='primary'][data-shape='soft'] {
+  @apply bg-[#192140] text-[#849DFF] border-none;
+}
+
+.root[data-variant='primary'][data-shape='surface'] {
+  @apply bg-[#15192D] text-[#849DFF] border border-[#273E89];
+}
+
+.root[data-variant='primary'][data-shape='outline'] {
+  @apply bg-transparent text-[#849DFF] border border-[#273E89];
+}
+
+.root[data-variant='primary'][data-shape='ghost'] {
+  @apply bg-transparent text-[#849DFF] border-none;
+}
+
+/********** PRIMARY HOVER **********/
+
+.root[data-variant='primary'][data-shape='solid']:hover {
   @apply bg-[#5373E7];
 }
 
-.root[data-active] {
-  @apply bg-[#5373E7];
+.root[data-variant='primary'][data-shape='soft']:hover {
+  @apply bg-[#1C274F];
+}
+
+.root[data-variant='primary'][data-shape='surface']:hover {
+  @apply bg-[#1C274F] border border-[#2F4EB2];
+}
+
+.root[data-variant='primary'][data-shape='outline']:hover {
+  @apply bg-[#192140] border-[#2F4EB2];
+}
+
+.root[data-variant='primary'][data-shape='ghost']:hover {
+  @apply bg-[#192140];
+}
+
+/********** GRAY **********/
+
+.root[data-variant='gray'][data-shape='solid'] {
+  @apply bg-[#ECEDEE] text-[#000] border-none;
+}
+
+.root[data-variant='gray'][data-shape='soft'] {
+  @apply bg-[#26292B] text-[#ECEDEE] border-none;
+}
+
+.root[data-variant='gray'][data-shape='surface'] {
+  @apply bg-[#1A1D1E] text-[#ECEDEE] border border-[#3A3F42];
+}
+
+.root[data-variant='gray'][data-shape='outline'] {
+  @apply bg-transparent text-[#ECEDEE] border border-[#787F85];
+}
+
+.root[data-variant='gray'][data-shape='ghost'] {
+  @apply bg-transparent text-[#ECEDEE] border-none;
+}
+
+/********** GRAY HOVER **********/
+
+.root[data-variant='gray'][data-shape='solid']:hover {
+  @apply bg-[#fff];
+}
+
+.root[data-variant='gray'][data-shape='soft']:hover {
+  @apply bg-[#2B2F31];
+}
+
+.root[data-variant='gray'][data-shape='surface']:hover {
+  @apply bg-[#202425] border-[#4C5155];
+}
+
+.root[data-variant='gray'][data-shape='outline']:hover {
+  @apply bg-[##202425] border-[#3A3F42];
+}
+
+.root[data-variant='gray'][data-shape='ghost']:hover {
+  @apply bg-[#26292B];
 }
 
 .loading {
@@ -18,9 +96,6 @@
   @apply py-2 transform-none normal-case;
 }
 
-.gray {
-  @apply bg-[#ECEDEE] text-[#000];
-}
 
 .delete {
   @apply bg-[#AA2429] text-[#fff];
@@ -37,26 +112,6 @@
 .disabled,
 .disabled:hover {
   @apply bg-[#26292B] text-[#4C5155] cursor-not-allowed;
-}
-
-.soft {
-  @apply bg-[#192140] text-[#849DFF];
-}
-
-.soft:hover {
-  @apply bg-[#1C274F] text-[#849DFF]
-}
-
-.surface {
-  @apply bg-[#15192D] border border-[#273E89] text-[#849DFF];
-}
-
-.outline {
-  @apply bg-transparent border border-[#273E89] text-[#849DFF];
-}
-
-.ghost {
-  @apply bg-transparent text-[#849DFF];
 }
 
 

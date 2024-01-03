@@ -17,7 +17,7 @@ export default function SignOutButton() {
     router.refresh();
   };
   return (
-    <Button width={85} height={40} fontSize={15} onClick={handleSignOut}>
+    <Button variant='primary' shape='solid' width={85} height={40} fontSize={15} onClick={handleSignOut}>
       Log out
     </Button>
   );
