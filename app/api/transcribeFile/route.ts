@@ -10,6 +10,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { stat, mkdir, writeFile } from "fs/promises";
 import mime from "mime";
+import { getSBSessionFromHeaders } from "@/utils/supabase-session";
 
 const execAsync = promisify(exec);
 
@@ -143,18 +144,14 @@ const insertTranscription = async (url: string, transcriptionArray: any[], supab
 export async function POST(req: Request) {
   try {
     const headersList = headers();
-    const access_token = headersList.get('authorization')?.split(' ')[1] || '';
-    const refresh_token = headersList.get('X-Refresh-Token') || headersList.get('x-refresh-token') || '';
-
     const supabase = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
     let userId: string;
     try {
-      const session = await supabase.auth.setSession({ access_token, refresh_token: ( typeof refresh_token === 'string' ) ? refresh_token : refresh_token[0] });
-      if (!session?.data?.user?.id) throw new Error('Session Expired');
-      userId = session?.data?.user?.id
+      const session = await getSBSessionFromHeaders(headersList, supabase);
+      userId = session?.data?.user?.id as string;
     } catch (error) {
       return Response.json({ error: 'Session Expired' });
     }
