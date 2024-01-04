@@ -10,7 +10,7 @@ interface DropdownProps {
   onSelect: (option: string) => void;
   buttonIcon?: ReactNode;
   buttonText: string;
-  dropdownType: 'language' | 'generate';
+  dropdownType: 'language' | 'generate' | 'custom';
 }
 
 function classNames(...classes: (string | boolean)[]): string {
