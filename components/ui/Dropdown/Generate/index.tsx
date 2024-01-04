@@ -1,79 +1,29 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Dropdown from '@/components/ui/Dropdown';
 import SummaryPrompt from '../../SummaryPrompt';
-import { getData } from '@/utils/helpers';
-import { AxiosError } from 'axios';
 
 const generateType = [
-  {
-    title: 'Tweet/Thread',
-    type: 'tweet-or-thread'
-  }, 
-  {
-    title: 'Article',
-    type: 'article'
-  },
-  {
-    title: 'More Details',
-    type: 'more-details'
-  },
-  {
-    title: 'Presentation',
-    type: 'presentation'
-  },
-  {
-    title: 'Note/Memo',
-    type: 'note-or-memo'
-  },
-  {
-    title: 'Major Themes',
-    type: 'major-themes'
-  },
-  {
-    title: 'Key words',
-    type: 'keywords'
-  },
+  { title: 'Tweet/Thread', type: 'tweet-or-thread' },
+  { title: 'Article', type: 'article' },
+  { title: 'More Details', type: 'more-details' },
+  { title: 'Presentation', type: 'presentation' },
+  { title: 'Note/Memo', type: 'note-or-memo' },
+  { title: 'Major Themes', type: 'major-themes' },
+  { title: 'Key words', type: 'keywords' },
 ];
 
 const Generate = ({transcriptionId}: {transcriptionId: string}) => {
-  // const [selectedType, setSelectedType] = useState<string>('');
-  // const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-
   const [state, setState ] = useState({
     selectedType: '',
     selectedTitle: '',
     isSidebarOpen: false
   })
 
-  //{transcriptionId} : { transcriptionId: string }
-  // const handleTypeSelect = async (selectedOption: string) => {
-  //   const selectedType = generateType.find(v => v.title === selectedOption)?.type || '';
-  //     try {
-  //       console.log('Before API response:');
-
-  //       const response = await getData({
-  //         url: `/api/generate/${selectedType}/${transcriptionId}`
-  //       });
-
-  //       console.log('API response:', response);
-
-  //       if (response.success === true) {
-  //         setSelectedType(selectedType);
-  //         console.log('API response:', response);
-  //         setIsSidebarOpen(prevIsSidebarOpen => !prevIsSidebarOpen);
-
-  //       }
-  //     } catch (error) {
-  //       console.error((error as AxiosError)?.response?.data || error);
-  //     }
-  //   };
- 
   const handleTypeSelect = (selectedOption: string) => {
     const selectedOptionData = generateType.find(v => v.title === selectedOption);
     if (selectedOptionData) {
-      console.log('CALLLLED')
       setState({
         selectedType: selectedOptionData.type,
         selectedTitle: selectedOptionData.title,
@@ -90,7 +40,6 @@ const Generate = ({transcriptionId}: {transcriptionId: string}) => {
       <Dropdown
         options={generateType.map((v) => v.title)}
         selectedOption={generateType.find(v => v.type === state.selectedType)?.title || ''}
-        // onSelect={(selectedOption: string) => handleTypeSelect(selectedOption)}
         onSelect={(selectedOption: string) => handleTypeSelect(selectedOption)}
 
         buttonIcon={
@@ -100,7 +49,6 @@ const Generate = ({transcriptionId}: {transcriptionId: string}) => {
         }
         buttonText="Generate"
         dropdownType="generate"
-      
       />
       {state.isSidebarOpen && (
         <SummaryPrompt

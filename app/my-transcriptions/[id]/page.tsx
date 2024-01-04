@@ -50,10 +50,10 @@ async function Transcription({params, searchParams}: {params: {id: string}, sear
               <SummarizeModal />
             </NoSsr>
             <NoSsr>
-              <Language />
+              <Language transcriptionId={data.id} />
             </NoSsr>
             <NoSsr>
-              <Generate transcriptionId={data.id}/>
+              <Generate transcriptionId={data.id} />
             </NoSsr>
           </div>
           <div className="flex gap-3">
