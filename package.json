@@ -24,6 +24,8 @@
     "@types/formidable": "^3.4.5",
     "@upstash/ratelimit": "^0.4.4",
     "@upstash/redis": "^1.24.1",
+    "ai": "^2.2.31",
+    "axios": "^1.6.4",
     "bufferutil": "^4.0.8",
     "classnames": "^2.3.2",
     "flowbite-react": "^0.6.1",

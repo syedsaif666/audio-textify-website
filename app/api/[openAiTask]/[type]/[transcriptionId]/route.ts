@@ -1,28 +1,32 @@
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { Database } from "@/types_db";
+// import OpenAI from 'openai';
 import { Configuration, OpenAIApi } from 'openai';
 import { AxiosError } from 'axios';
 import { getSBSessionFromHeaders } from "@/utils/supabase-session";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { OpenAIStream, StreamingTextResponse } from 'ai';
 
 const tableName = process.env.TABLE_NAME!;
 const supabaseUrl= process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const apiKey = process.env.OPENAI_API_KEY;
 const systemMessage = 'You are a helpful assistant.';
+export const runtime = 'edge';
 
-export async function GET(req: any, { params }: {
+export async function POST(req: any, { params }: {
   params: {
     openAiTask: string,
     transcriptionId: string,
     type: string,
   }
 }) {
-  const headersList = headers();
-  const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
   try {
-    await getSBSessionFromHeaders(headersList, supabase);
+    await getSBSessionFromHeaders(supabase);
 
     const transcriptionList = await supabase.from(tableName).select().eq('id', params.transcriptionId);
 
@@ -35,26 +39,19 @@ export async function GET(req: any, { params }: {
 
     console.log("Original Transcription Text:", transcriptionText);
 
-    let result;
-
     switch (params.openAiTask.toLowerCase()) {
       case 'summarize':
-        result = await summarizeText(transcriptionText);
-        console.log('Summarized:', result);
+        return await summarizeText(transcriptionText);
         break;
       case 'translate':
-        result = await translateText(transcriptionText, params.type || 'en');
-        console.log(`Translated to ${params.type}:`, result);
+        return await translateText(transcriptionText, params.type || 'en');
         break;
       case 'generate':
-        result = await generateText(transcriptionText, params.type || 'tweet');
-        console.log(`Generated ${params.type || 'tweet-or-thread'} text:`, result);
+        return await generateText(transcriptionText, params.type || 'tweet');
         break;
       default:
         throw new Error(`Unsupported type: ${params.openAiTask}`);
     }
-
-    return Response.json({ success: true, result });
 
   } catch (error) {
     console.error((error as AxiosError)?.response?.data || error);
@@ -68,13 +65,13 @@ const summarizeText = async (text: string): Promise<any> => {
   return await openAiOperation(systemMessage, prompt);
 }
 
-const translateText = async (text: string, language: string): Promise<string> => {
+const translateText = async (text: string, language: string) => {
   const prompt = `You will be provided with a sentence in English, and your task is to translate it into ${language}:\n"${text}"`;
 
   return await openAiOperation(systemMessage, prompt)
 }
 
-const generateText = async (text: string, genType: string): Promise<string> => {
+const generateText = async (text: string, genType: string) => {
   let prompt = '';
 
   switch (genType.toLowerCase()) {
@@ -107,24 +104,47 @@ const generateText = async (text: string, genType: string): Promise<string> => {
 }
 
 
-const openAiOperation = async (systemMessage: string, prompt: string) => {
+// const openAiOperation = async (systemMessage: string, prompt: string) => {
+//   const openai = new OpenAI({ apiKey });
+
+//   const response = await openai.chat.completions.create({
+//     model: 'gpt-3.5-turbo',
+//     stream: true,
+//     messages: [{ role: 'system', content: systemMessage }, { role: 'user', content: prompt }]
+//   })
+
+//   const stream = OpenAIStream(response, {
+//     onCompletion:async (completion:string) => {
+//         await console.log('Chat completed')
+//     }
+//   })
+//   // Respond with the stream
+//   return new StreamingTextResponse(stream)
+// };
+
+
+
+
+const openAiOperation = async (systemMessage: string, prompt: string): Promise<StreamingTextResponse> => {
   const configuration = new Configuration({ apiKey });
   const openai = new OpenAIApi(configuration);
 
-  const response = await openai.createChatCompletion({
+  const apiRequestBody = {
     model: 'gpt-3.5-turbo',
     messages: [{ role: 'system', content: systemMessage }, { role: 'user', content: prompt }],
+    stream: true
+  };
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(apiRequestBody)
   });
 
-  const responseData = response.data;
+  const stream = OpenAIStream(response);
 
-  if (!responseData?.choices || responseData?.choices?.length === 0) {
-    throw new Error('No choices found in the OpenAI response');
-  }
-
-  const assistantReply = responseData.choices[0]?.message?.content || '';
-  const result = assistantReply.replace(/^.*?:\s/, '');
-
-  return result.trim();
-
+  return new StreamingTextResponse(stream);
 };
