@@ -53,7 +53,7 @@ async function Transcription({params, searchParams}: {params: {id: string}, sear
               <Language />
             </NoSsr>
             <NoSsr>
-              <Generate />
+              <Generate transcriptionId={data.id}/>
             </NoSsr>
           </div>
           <div className="flex gap-3">

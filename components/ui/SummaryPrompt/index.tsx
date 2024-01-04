@@ -1,24 +1,35 @@
 'use client';
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment, useEffect } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import copyText from '@/public/assets/icons/copy.svg';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
+import { useCompletion } from 'ai/react';
 
 interface Props {
   title: string;
+  type: string;
+  page: string;
+  transcriptionId: string;
   isOpen: boolean;
   setIsOpen: Function;
 }
 
-const SummaryPrompt: React.FC<Props> = ({ title, isOpen, setIsOpen }) => {
+const SummaryPrompt: React.FC<Props> = ({ title, isOpen, setIsOpen, type, page, transcriptionId }) => {
+  const {
+    completion,
+    isLoading,
+    complete
+  } = useCompletion({
+    api: `/api/${page}/${type}/${transcriptionId}`
+  });
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
 
   useEffect(() => {
-    console.log('TITLE', title, isOpen)
-  }, [title])
+    complete('Mock');
+  }, [])
 
   return (
     <>
@@ -47,7 +58,7 @@ const SummaryPrompt: React.FC<Props> = ({ title, isOpen, setIsOpen }) => {
                   leaveTo="translate-x-full"
                 >
                 <div className="fixed h-full right-0 w-96 bg-[#15192D] shadow-md flex flex-col justify-between">
-                  <div className="flex flex-col gap-6 py-7 px-6">
+                  <div className="flex flex-col gap-6 py-7 px-6 overflow-auto ">
                     <div className='flex justify-between items-center'>
                       <Dialog.Title as="h3" className="text-lg text-[#ECEDEE] font-semibold tracking-[0.05rem]">
                         {title}
@@ -61,6 +72,8 @@ const SummaryPrompt: React.FC<Props> = ({ title, isOpen, setIsOpen }) => {
                     </div>
                     <Dialog.Description as='p' className="text-sm text-[#ECEDEE] text-sm tracking-[0.04038rem]">
                       Summarize the entire transcript or choose a custom duration.
+                      {isLoading && (<div>Loading</div>)}
+                      <output>{completion}</output>
                     </Dialog.Description>
                   </div>
                   <p className='bg-[#11131F] py-3.5 px-6 text-center text-[#ECEDEE] text-[0.9375rem] cursor-pointer' onClick={toggleSidebar}>Cancel and go back</p>
