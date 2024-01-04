@@ -178,7 +178,7 @@ export default async function Account() {
             )}
             <div className="flex flex-col justify-center gap-y-2 max-md:flex-grow max-lg:flex-shrink-0 ">
               {!subscription ? (
-                <Button width={169.6} height={40} fontSize={15}>
+                <Button variant='primary' shape='solid' width={169.6} height={40} fontSize={15}>
                   <Link href="/#Pricing">
                     Choose your plan
                   </Link>
@@ -237,7 +237,7 @@ export default async function Account() {
                 maxLength={64}
               />
             </form>
-            <Button width={85} height={40} fontSize={15} type="submit" form="nameForm">
+            <Button variant='primary' shape='solid' width={85} height={40} fontSize={15} type="submit" form="nameForm">
               Update
             </Button>
           </div>
@@ -261,7 +261,7 @@ export default async function Account() {
                 maxLength={64}
               />
             </form>
-            <Button width={85} height={40} fontSize={15} type="submit" form="emailForm">
+            <Button variant='primary' shape='solid' width={85} height={40} fontSize={15} type="submit" form="emailForm">
               Update
             </Button>
           </div>
@@ -285,7 +285,7 @@ export default async function Account() {
                 maxLength={64}
               />
             </form>
-            <Button width={85} height={40} fontSize={15} type="submit" form="passwordForm">
+            <Button variant='primary' shape='solid' width={85} height={40} fontSize={15} type="submit" form="passwordForm">
               Update
             </Button>
           </div>

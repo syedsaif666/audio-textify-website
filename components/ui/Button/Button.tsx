@@ -1,4 +1,4 @@
-// components/Button.tsx
+'use client';
 
 import cn from 'classnames';
 import React, { forwardRef, useRef, ButtonHTMLAttributes } from 'react';
@@ -12,7 +12,7 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   width?: number | string;
   height?: number | string;
   variant?: 'slim' | 'flat' | 'gray' | 'primary' | 'delete' | 'deactivate';
-  shape?: 'soft' | 'surface' | 'outline' | 'ghost' | 'solid'; // Combined type and shape into 'shape'
+  shape?: 'soft' | 'surface' | 'outline' | 'ghost' | 'solid';
   fontSize?: number;
   Component?: React.ComponentType;
 }
@@ -27,7 +27,7 @@ const Button = forwardRef<HTMLButtonElement, Props>((props, buttonRef) => {
     disabled = false,
     width,
     height,
-    shape = 'solid', // Default shape to 'solid'
+    shape = 'solid',
     fontSize,
     style = {},
     Component = 'button',
@@ -39,14 +39,14 @@ const Button = forwardRef<HTMLButtonElement, Props>((props, buttonRef) => {
   const rootClassName = cn(
     styles.root,
     styles[variant],
-    styles[shape], // Apply variant styles directly
+    styles[shape],
     {
       [styles.slim]: variant === 'slim',
       [styles.delete]: variant === 'delete',
       [styles.deactivate]: variant === 'deactivate',
       [styles.loading]: loading,
       [styles.disabled]: disabled,
-      [styles[shape]]: shape && styles[shape], // Apply shape styles dynamically
+      [styles[shape]]: shape && styles[shape],
     },
     className
   );

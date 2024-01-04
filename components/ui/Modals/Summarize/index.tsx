@@ -4,7 +4,7 @@ import { Fragment, useState } from 'react';
 import Button from '@/components/ui/Button';
 import DurationPicker from '../../DurationPicker';
 const SummarizeModal = () => {
-  let [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [isSummarizeEnabled, setIsSummarizeEnabled] = useState(false);
 
   const closeModal = () => {
@@ -17,7 +17,7 @@ const SummarizeModal = () => {
 
   return (
     <>
-      <Button shape='soft' height={40} fontSize={15} onClick={openModal}>
+      <Button variant='primary' shape="soft" height={40} fontSize={15} onClick={openModal}>
         Summarize
       </Button>
       <Transition appear show={isOpen} as={Fragment}>
@@ -58,7 +58,7 @@ const SummarizeModal = () => {
                   Summarize the entire transcript or choose a custom duration.
                   </p>
                 </div>
-                <Button height={40} width='100%' fontSize={15}>
+                <Button height={40} width='100%' fontSize={15} variant='primary' shape='solid'>
                   Summarize entire transcript
                 </Button>
                 <div className='flex items-center justify-between'>
