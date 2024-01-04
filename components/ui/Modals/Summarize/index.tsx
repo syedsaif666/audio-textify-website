@@ -3,9 +3,11 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment, useState } from 'react';
 import Button from '@/components/ui/Button';
 import DurationPicker from '../../DurationPicker';
-const SummarizeModal = () => {
+import SummaryPrompt from '../../SummaryPrompt';
+const SummarizeModal = ({transcriptionId}: {transcriptionId: string}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSummarizeEnabled, setIsSummarizeEnabled] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const closeModal = () => {
     setIsOpen(false);
@@ -13,6 +15,11 @@ const SummarizeModal = () => {
 
   const openModal = () => {
     setIsOpen(true);
+  };
+
+  const handleSidebarOpen = (val: boolean) => {
+    setIsSidebarOpen(val);
+    setIsOpen(false);
   };
 
   return (
@@ -59,7 +66,7 @@ const SummarizeModal = () => {
                   </p>
                 </div>
                 <Button height={40} width='100%' fontSize={15} variant='primary' shape='solid'>
-                  Summarize entire transcript
+                  <p onClick={() => handleSidebarOpen(true)}>Summarize entire transcript</p>
                 </Button>
                 <div className='flex items-center justify-between'>
                   <div className="bg-[#313538] w-36 h-px flex-col my-auto"></div>
@@ -78,6 +85,16 @@ const SummarizeModal = () => {
           </div>
         </Dialog>
       </Transition>
+      {isSidebarOpen && (
+        <SummaryPrompt
+          title="Summarize"
+          type="data"
+          isOpen={isSidebarOpen}
+          setIsOpen={setIsSidebarOpen}
+          page='summarize'
+          transcriptionId={transcriptionId}
+        />
+      )}
     </>
   );
 };
