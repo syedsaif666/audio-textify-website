@@ -5,7 +5,6 @@ import copyText from '@/public/assets/icons/copy.svg';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import { useCompletion } from 'ai/react';
-import LoadingDots from '../LoadingDots';
 
 interface Props {
   title: string;
@@ -72,7 +71,7 @@ const SummaryPrompt: React.FC<Props> = ({ title, isOpen, setIsOpen, type, page, 
                       </div>
                     </div>
                     <Dialog.Description as='p' className="text-sm text-[#ECEDEE] text-sm tracking-[0.04038rem]">
-                      {isLoading && (<LoadingDots />)}
+                      {isLoading}
                       <output>{completion}</output>
                     </Dialog.Description>
                   </div>
