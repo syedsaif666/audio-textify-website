@@ -7,12 +7,10 @@ import { redirect } from 'next/navigation';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Database } from '@/types_db';
 import '@/styles/audio.css';
-import Button from '@/components/ui/Button';
 import NoSsr from '@/components/ui/NoSsr';
 import convertSecondsToHours from '@/utils/timeConversion';
 import Language from '@/components/ui/Dropdown/Language';
 import Generate from '@/components/ui/Dropdown/Generate';
-import AudioPlayer from '@/components/ui/AudioPlayer';
 import SummarizeModal from '@/components/ui/Modals/Summarize';
 import DownloadModal from '@/components/ui/Modals/Download';
 import DeleteModal from '@/components/ui/Modals/Delete';
@@ -41,9 +39,6 @@ async function Transcription({params, searchParams}: {params: {id: string}, sear
           <span className='0.875rem leading-5'>{`#${data.id.substring(0, 20)}`}</span>
           <span>{new Date(data.created_at).toLocaleString()}</span>
         </div>
-        <NoSsr>
-          <AudioPlayer />
-        </NoSsr>
         <div className="flex items-center justify-between">
           <div className="flex gap-3">
             <NoSsr>
