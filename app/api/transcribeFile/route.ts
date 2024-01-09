@@ -43,11 +43,6 @@ const getFileType = (filePath: string) => {
 };
 
 const getFileExtension = (pathname: string) => {
-  // Parse the URL to get the pathname
-  // const parsedUrl = new URL(urlString);
-  // const pathname = parsedUrl.pathname;
-
-  // Use path.extname to extract the extension from the pathname
   return path.extname(pathname).toLowerCase();
 };
 
@@ -58,11 +53,8 @@ const getAudioDuration = async (filePath: string): Promise<number> => {
 };
 
 // Main transcription function
-const startTranscription = async (url: string, audioPath: string, supabase: SupabaseClient, userId: string) => {
-  // console.log('Downloading File');
-  // await downloadFile(url, filePath);
+const startTranscription = async (url: string, audioPath: string, supabase: SupabaseClient, userId: string, originalFileName: string) => {
 
-  // console.log('Download Step Finished');
   const fileType = getFileType(url);
 
   let fileForTranscription = url;
@@ -95,21 +87,22 @@ const startTranscription = async (url: string, audioPath: string, supabase: Supa
   }
 
   // Insert the array into Supabase
-  const insertSuccess = await insertTranscription(url, transcriptionArray, supabase, userId);
+  const insertSuccess = await insertTranscription(url, transcriptionArray, supabase, userId, originalFileName);
   if (insertSuccess) {
     console.log('All transcriptions have been successfully inserted into Supabase.');
   }
+  return insertSuccess;
 };
 
 // Function to transcribe a single segment
-const transcribeSegment = async (segmentPath: string, startTime: number, endTime: number): Promise<{startTime: number, endTime: number, text: string}> => {
+const transcribeSegment = async (segmentPath: string, startTime: number, endTime: number): Promise<{startTime: number, endTime: number, text: string, id?: number}> => {
   const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
   });
 
   const openai = new OpenAIApi(configuration);
   const audioStream: any = createReadStream(segmentPath);
-  
+
   const resp = await openai.createTranscription(audioStream, 'whisper-1');
   const transcript = resp?.data?.text;
 
@@ -121,21 +114,31 @@ const transcribeSegment = async (segmentPath: string, startTime: number, endTime
 };
 
 // Function to insert the transcribed array into Supabase
-const insertTranscription = async (url: string, transcriptionArray: any[], supabase: SupabaseClient, userId: string): Promise<boolean> => {
+const insertTranscription = async (url: string, transcriptionArray: any[], supabase: SupabaseClient, userId: string, originalFileName: string) => {
   console.log('Inserting transcription to Supabase');
 
   const { error } = await supabase.from(tableName).insert({
     input_url: url,
     transcribed_data: transcriptionArray,
-    user_id: userId
+    user_id: userId,
+    file_name: originalFileName,
   });
+
 
   if (error) {
     console.error("Supabase Error:", error);
     return false;
   } else {
     console.log('Transcription inserted into Supabase successfully.');
-    return true;
+    const { data } = await supabase.from(tableName).select('id').filter('input_url', 'eq', url);
+    const transcriptionId = data?.[0]?.id;
+
+
+    console.log(transcriptionId);
+    if (transcriptionId) {
+      return transcriptionId;
+    }
+    return false;
   }
 };
 
@@ -162,6 +165,9 @@ export async function POST(req: Request) {
     const body = await req.formData();
 
     const file = body.get("file") as Blob | null;
+    const uploadedFileName = body.get("fileName") as string;
+    const originalFileName = path.parse(uploadedFileName).name;
+
     if (!file) {
       return Response.json(
         { error: "File blob is required." },
@@ -188,7 +194,6 @@ export async function POST(req: Request) {
         );
       }
     }
-
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
     const filename = `${uniqueSuffix}.${mime.getExtension(file.type)}`;
     try {
@@ -204,23 +209,22 @@ export async function POST(req: Request) {
     const url = `${uploadDir}/${filename}`;
 
     if (file && url && fs.existsSync(url)) {
-      
-      // const startIndex = url.indexOf('/tmp');
-      // url = url.substring(startIndex);
+
       const alreadyExist = await supabase.from(tableName).select('*').filter('input_url', 'eq', url);
       if (alreadyExist?.data && alreadyExist?.data?.length) {
         return Response.json({error: 'Already Exist'}, {status: 400});
       }
-    
+
       const fileExt = getFileExtension(url);
-      // const filePath = path.join('/tmp', `downloadedFile${Date.now()}${fileExt}`); // Temporary file path
       const audioPath = path.join('/tmp', `audio${Date.now()}.wav`); // Temporary audio path
-    
       try {
-        startTranscription(url, audioPath, supabase, userId);
-        return Response.json({
-          message: 'File submitted for processing'
-        }, {status: 200});
+        const transcriptionId = await startTranscription(url, audioPath, supabase, userId, originalFileName);
+        if (transcriptionId) return Response.json({
+          success: true,
+          message: 'Transcription created',
+          transcriptionId
+        });
+        throw new Error('Unable to transcribe');
       } catch (error) {
         console.error('server error', error);
         return Response.json({ error: 'Error' }, {status: 500});

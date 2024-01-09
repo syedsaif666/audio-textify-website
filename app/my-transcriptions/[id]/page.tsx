@@ -17,7 +17,7 @@ import DeleteModal from '@/components/ui/Modals/Delete';
 
 const tableName = process.env.TABLE_NAME!;
 
-async function Transcription({params, searchParams}: {params: {id: string}, searchParams: {index: number}}) {
+async function Transcription({params}: {params: {id: string}}) {
   const transcriptionId = params.id;
   const supabase = createServerComponentClient<Database>({ cookies })
 
@@ -35,7 +35,7 @@ async function Transcription({params, searchParams}: {params: {id: string}, sear
     return (
       <div className="w-[64vw] m-auto pt-10 pb-10 flex flex-col gap-7">
         <div className="flex flex-col gap-1.5 text-[#9ba1a6] font-light leading-6 tracking-[0.005rem]">
-          <h1 className='text-3xl font-semibold leading-9 tracking-[0.00938rem] text-[#ECEDEE]'>Transcription {`${searchParams.index}`}</h1>
+          <h1 className='text-3xl font-semibold leading-9 tracking-[0.00938rem] text-[#ECEDEE]'>Transcription {data.file_name}</h1>
           <span className='0.875rem leading-5'>{`#${data.id.substring(0, 20)}`}</span>
           <span>{new Date(data.created_at).toLocaleString()}</span>
         </div>
