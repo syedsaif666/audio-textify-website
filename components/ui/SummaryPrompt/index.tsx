@@ -5,6 +5,7 @@ import copyText from '@/public/assets/icons/copy.svg';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import { useCompletion } from 'ai/react';
+import { timeLog } from 'console';
 
 interface Props {
   title: string;
@@ -13,15 +14,40 @@ interface Props {
   transcriptionId: string;
   isOpen: boolean;
   setIsOpen: Function;
+  duration?: {
+    startTime: {
+      hours: string;
+      minutes: string;
+      seconds: string;
+    } ,
+    endTime: {
+      hours: string;
+      minutes: string;
+      seconds: string;
+    }
+  };
 }
 
-const SummaryPrompt: React.FC<Props> = ({ title, isOpen, setIsOpen, type, page, transcriptionId }) => {
+const SummaryPrompt: React.FC<Props> = ({ title, isOpen, setIsOpen, type, page, transcriptionId, duration }) => {
+  let url = `/api/${page}/${type}/${transcriptionId}`;
+  if (duration) {
+
+    const startTimeString = `${duration.startTime.hours}:${duration.startTime.minutes}:${duration.startTime.seconds}`
+    const endTimeString = `${duration.endTime.hours}:${duration.endTime.minutes}:${duration.endTime.seconds}`;
+
+    const timeToSeconds = (time: string) => {
+      const [hours, minutes, seconds] = time.split(':').map(Number);
+      return hours * 3600 + minutes * 60 + seconds;
+    }
+
+    url = `/api/${page}/${type}/${transcriptionId}?startTime=${timeToSeconds(startTimeString)}&endTime=${timeToSeconds(endTimeString)}`
+  }
   const {
     completion,
     isLoading,
     complete
   } = useCompletion({
-    api: `/api/${page}/${type}/${transcriptionId}`
+    api: url
   });
   const toggleSidebar = () => {
     setIsOpen(!isOpen);

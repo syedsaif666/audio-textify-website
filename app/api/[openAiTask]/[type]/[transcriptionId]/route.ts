@@ -20,8 +20,14 @@ export async function POST(req: any, { params }: {
     openAiTask: string,
     transcriptionId: string,
     type: string,
-  }
+  },
 }) {
+  const searchParams = req.nextUrl.searchParams;
+  const query = {
+    startTime: searchParams.get('startTime'),
+    endTime: searchParams.get('endTime'),
+  };
+
   const cookieStore = cookies()
   const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
@@ -35,20 +41,32 @@ export async function POST(req: any, { params }: {
     }
 
     const transcription = transcriptionList?.data[0];
-    const transcriptionText = transcription?.transcribed_data?.map((v: any) => v.text).join(" ");
+    let transcriptionText = transcription?.transcribed_data?.map((v: any) => v.text).join(" ");
 
     console.log("Original Transcription Text:", transcriptionText);
 
     switch (params.openAiTask.toLowerCase()) {
       case 'summarize':
+
+      console.log("query", query)
+        if (query?.startTime && query?.endTime) {
+
+          const startIndex = transcription?.transcribed_data.findIndex((segment: any) =>
+            segment.startTime >= query.startTime! || query.startTime! <= segment.endTime
+          );
+
+          const endIndex = transcription?.transcribed_data.findIndex((segment: any) =>
+            segment.startTime === query.endTime! || query.endTime! <= segment.endTime
+          );
+
+          transcriptionText = transcription?.transcribed_data?.slice(startIndex, endIndex + 1).map((v: any) => v.text).join(" ");
+          console.log("duration transcriptionText -------------------------------------------------", transcriptionText)
+        }
         return await summarizeText(transcriptionText);
-        break;
       case 'translate':
         return await translateText(transcriptionText, params.type || 'en');
-        break;
       case 'generate':
         return await generateText(transcriptionText, params.type || 'tweet');
-        break;
       default:
         throw new Error(`Unsupported type: ${params.openAiTask}`);
     }
@@ -102,28 +120,6 @@ const generateText = async (text: string, genType: string) => {
 
   return await openAiOperation(systemMessage, prompt)
 }
-
-
-// const openAiOperation = async (systemMessage: string, prompt: string) => {
-//   const openai = new OpenAI({ apiKey });
-
-//   const response = await openai.chat.completions.create({
-//     model: 'gpt-3.5-turbo',
-//     stream: true,
-//     messages: [{ role: 'system', content: systemMessage }, { role: 'user', content: prompt }]
-//   })
-
-//   const stream = OpenAIStream(response, {
-//     onCompletion:async (completion:string) => {
-//         await console.log('Chat completed')
-//     }
-//   })
-//   // Respond with the stream
-//   return new StreamingTextResponse(stream)
-// };
-
-
-
 
 const openAiOperation = async (systemMessage: string, prompt: string): Promise<StreamingTextResponse> => {
   const configuration = new Configuration({ apiKey });

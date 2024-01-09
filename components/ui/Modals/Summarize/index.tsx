@@ -4,10 +4,29 @@ import { Fragment, useState } from 'react';
 import Button from '@/components/ui/Button';
 import DurationPicker from '../../DurationPicker';
 import SummaryPrompt from '../../SummaryPrompt';
-const SummarizeModal = ({transcriptionId}: {transcriptionId: string}) => {
+
+const SummarizeModal = ({transcription}: {transcription: any}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSummarizeEnabled, setIsSummarizeEnabled] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [sidebarPropsData, setSidebarPropsData] = useState<{
+    open: boolean;
+    type?: 'full-text' | 'duration'
+  }>({
+    open: false,
+  });
+
+  const [duration, setDuration] = useState<{
+    startTime: {
+      hours: string;
+      minutes: string;
+      seconds: string;
+    },
+    endTime: {
+      hours: string;
+      minutes: string;
+      seconds: string;
+    }
+  } | null >(null)
 
   const closeModal = () => {
     setIsOpen(false);
@@ -17,9 +36,25 @@ const SummarizeModal = ({transcriptionId}: {transcriptionId: string}) => {
     setIsOpen(true);
   };
 
-  const handleSidebarOpen = (val: boolean) => {
-    setIsSidebarOpen(val);
+  const setIsSidebarOpen = (val: boolean) => setSidebarPropsData({
+    ...sidebarPropsData,
+    open: val
+  })
+
+  const handleSidebarOpen = (val: boolean, type: 'full-text' | 'duration') => {
+    if (type === 'duration' && duration?.startTime === duration?.endTime) {
+      return;
+    }
+    setSidebarPropsData({
+      ...sidebarPropsData,
+      open: val,
+      type
+    });
     setIsOpen(false);
+  };
+
+  const handleDurationChange = (newDuration: { startTime: any; endTime: any }) => {
+    setDuration(newDuration)
   };
 
   return (
@@ -66,7 +101,7 @@ const SummarizeModal = ({transcriptionId}: {transcriptionId: string}) => {
                   </p>
                 </div>
                 <Button height={40} width='100%' fontSize={15} variant='primary' shape='solid'>
-                  <p onClick={() => handleSidebarOpen(true)}>Summarize entire transcript</p>
+                  <p onClick={() => handleSidebarOpen(true, 'full-text')}>Summarize entire transcript</p>
                 </Button>
                 <div className='flex items-center justify-between'>
                   <div className="bg-[#313538] w-36 h-px flex-col my-auto"></div>
@@ -76,23 +111,24 @@ const SummarizeModal = ({transcriptionId}: {transcriptionId: string}) => {
                 <div>
                   <p className='text-[#ECEDEE] text-sm font-medium tracking-[0/0438]'>Choose a duration</p>
                   <div className='flex items-center my-3'>
-                    <DurationPicker setIsSummarizeEnabled={setIsSummarizeEnabled} />
+                    <DurationPicker setIsSummarizeEnabled={setIsSummarizeEnabled} onDurationChange={handleDurationChange} limit={transcription?.transcribed_data[(transcription?.transcribed_data?.length || 1) - 1]?.endTime || 0} />
                   </div>
-                  <Button disabled={!isSummarizeEnabled} height={40} width='100%' fontSize={15}>Summarize for duration</Button>
+                  <Button variant='primary' shape='solid' disabled={!isSummarizeEnabled} height={40} width='100%' fontSize={15} onClick={() => handleSidebarOpen(true, 'duration')}>Summarize for duration</Button>
                 </div>
               </div>
             </Transition.Child>
           </div>
         </Dialog>
       </Transition>
-      {isSidebarOpen && (
+      {sidebarPropsData.open && (
         <SummaryPrompt
           title="Summarize"
           type="data"
-          isOpen={isSidebarOpen}
+          isOpen={sidebarPropsData.open}
           setIsOpen={setIsSidebarOpen}
           page='summarize'
-          transcriptionId={transcriptionId}
+          transcriptionId={transcription.id}
+          duration={sidebarPropsData.type === 'duration' ? duration || undefined : undefined}
         />
       )}
     </>

@@ -42,7 +42,7 @@ async function Transcription({params, searchParams}: {params: {id: string}, sear
         <div className="flex items-center justify-between">
           <div className="flex gap-3">
             <NoSsr>
-              <SummarizeModal transcriptionId={data.id} />
+              <SummarizeModal transcription={data} />
             </NoSsr>
             <NoSsr>
               <Language transcriptionId={data.id} />
